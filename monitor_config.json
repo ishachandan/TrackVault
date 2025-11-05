@@ -1,0 +1,15 @@
+{
+  "watch_paths": [
+    "C:\\Users\\YourUsername\\Desktop",
+    "C:\\Users\\YourUsername\\Documents"
+  ],
+  "excluded_extensions": [".tmp", ".log", ".pyc", ".db", ".db-journal"],
+  "excluded_paths": ["__pycache__", "node_modules", ".git", "monitor_data.db"],
+  "risk_settings": {
+    "high_risk_extensions": [".exe", ".dll", ".sys", ".bat", ".cmd", ".ps1"],
+    "high_risk_actions": ["DELETE", "MOVE"],
+    "sensitive_paths": ["system32", "windows", "program files"]
+  },
+  "sync_interval": 3,
+  "max_buffer_size": 100
+}

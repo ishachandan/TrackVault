@@ -1,0 +1,61 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: trackvault-postgres
+    environment:
+      POSTGRES_DB: trackvault
+      POSTGRES_USER: trackvault
+      POSTGRES_PASSWORD: trackvault_password_2024
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/database:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trackvault -d trackvault"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache & Queue
+  redis:
+    image: redis:7-alpine
+    container_name: trackvault-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: trackvault-backend
+    environment:
+      DATABASE_URL: postgresql://trackvault:trackvault_password_2024@postgres:5432/trackvault
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: trackvault-super-secret-jwt-key-change-in-production
+      ENVIRONMENT: development
+      LOG_LEVEL: info
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local

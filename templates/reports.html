@@ -1,0 +1,259 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Reports - TRACKVAULT{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="btn-group">
+            <button class="btn btn-outline-primary active" data-period="7d">Last 7 Days</button>
+            <button class="btn btn-outline-primary" data-period="30d">Last 30 Days</button>
+            <button class="btn btn-outline-primary" data-period="90d">Last 90 Days</button>
+        </div>
+    </div>
+    <div class="col-md-6 text-end">
+        <div class="btn-group">
+            <button class="btn btn-success">
+                <i class="bi bi-download me-1"></i>Export PDF
+            </button>
+            <button class="btn btn-info">
+                <i class="bi bi-file-earmark-excel me-1"></i>Export Excel
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Activity Trends Chart -->
+    <div class="col-lg-8 mb-4">
+        <div class="chart-card">
+            <h5 class="mb-3"><i class="bi bi-graph-up me-2"></i>Activity Trends</h5>
+            <div class="chart-container">
+                <canvas id="activityTrendsChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Risk Distribution -->
+    <div class="col-lg-4 mb-4">
+        <div class="chart-card">
+            <h5 class="mb-3"><i class="bi bi-pie-chart me-2"></i>Risk Distribution</h5>
+            <div class="chart-container">
+                <canvas id="riskDistributionChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- User Activity -->
+    <div class="col-lg-6 mb-4">
+        <div class="chart-card">
+            <h5 class="mb-3"><i class="bi bi-person-lines-fill me-2"></i>Top Active Users</h5>
+            <div class="chart-container">
+                <canvas id="userActivityChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- File Types -->
+    <div class="col-lg-6 mb-4">
+        <div class="chart-card">
+            <h5 class="mb-3"><i class="bi bi-file-earmark me-2"></i>File Types Accessed</h5>
+            <div class="chart-container">
+                <canvas id="fileTypesChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Hourly Activity Heatmap -->
+    <div class="col-12 mb-4">
+        <div class="chart-card">
+            <h5 class="mb-3"><i class="bi bi-calendar-heat me-2"></i>Activity Heatmap (24 Hours)</h5>
+            <div class="chart-container">
+                <canvas id="activityHeatmapChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Initialize charts when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts();
+});
+
+function initializeCharts() {
+    // Activity Trends Chart
+    const activityCtx = document.getElementById('activityTrendsChart').getContext('2d');
+    new Chart(activityCtx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Authorized',
+                data: [65, 59, 80, 81, 56, 55, 40],
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Unauthorized',
+                data: [28, 48, 40, 19, 86, 27, 90],
+                borderColor: '#dc3545',
+                backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            }
+        }
+    });
+
+    // Risk Distribution Chart
+    const riskCtx = document.getElementById('riskDistributionChart').getContext('2d');
+    new Chart(riskCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+            datasets: [{
+                data: [60, 30, 10],
+                backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+
+    // User Activity Chart
+    const userCtx = document.getElementById('userActivityChart').getContext('2d');
+    new Chart(userCtx, {
+        type: 'bar',
+        data: {
+            labels: ['john.doe', 'jane.smith', 'alice.wilson', 'bob.johnson', 'carol.brown'],
+            datasets: [{
+                label: 'Activities',
+                data: [120, 95, 87, 76, 65],
+                backgroundColor: '#007bff',
+                borderColor: '#0056b3',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // File Types Chart
+    const fileTypesCtx = document.getElementById('fileTypesChart').getContext('2d');
+    new Chart(fileTypesCtx, {
+        type: 'pie',
+        data: {
+            labels: ['PDF', 'DOCX', 'XLSX', 'TXT', 'JSON', 'Others'],
+            datasets: [{
+                data: [35, 25, 20, 10, 5, 5],
+                backgroundColor: [
+                    '#dc3545',
+                    '#007bff',
+                    '#28a745',
+                    '#ffc107',
+                    '#17a2b8',
+                    '#6c757d'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+
+    // Activity Heatmap Chart
+    const heatmapCtx = document.getElementById('activityHeatmapChart').getContext('2d');
+    const heatmapData = [];
+    for (let hour = 0; hour < 24; hour++) {
+        heatmapData.push({
+            x: hour,
+            y: 1,
+            v: Math.floor(Math.random() * 100)
+        });
+    }
+    
+    new Chart(heatmapCtx, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'Activity Level',
+                data: heatmapData,
+                backgroundColor: function(context) {
+                    const value = context.parsed.v;
+                    const alpha = value / 100;
+                    return `rgba(0, 123, 255, ${alpha})`;
+                },
+                pointRadius: function(context) {
+                    return Math.max(5, context.parsed.v / 5);
+                }
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    min: 0,
+                    max: 23,
+                    title: {
+                        display: true,
+                        text: 'Hour of Day'
+                    }
+                },
+                y: {
+                    display: false,
+                    min: 0.5,
+                    max: 1.5
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

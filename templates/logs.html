@@ -1,0 +1,116 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Activity Logs - TRACKVAULT{% endblock %}
+
+{% block content %}
+<!-- Filters Section -->
+<div class="filters-section mb-4">
+    <div class="row">
+        <div class="col-md-3">
+            <label class="form-label">Date Range</label>
+            <input type="date" class="form-control" id="startDate">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">&nbsp;</label>
+            <input type="date" class="form-control" id="endDate">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Status</label>
+            <select class="form-select" id="statusFilter">
+                <option value="">All Status</option>
+                <option value="Authorized">Authorized</option>
+                <option value="Unauthorized">Unauthorized</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Risk Level</label>
+            <select class="form-select" id="riskFilter">
+                <option value="">All Risks</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">&nbsp;</label>
+            <button class="btn btn-primary w-100" id="applyFilters">
+                <i class="bi bi-funnel me-1"></i>Filter
+            </button>
+        </div>
+    </div>
+    
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div class="search-container">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" class="form-control" placeholder="Search logs..." id="searchLogs">
+            </div>
+        </div>
+        <div class="col-md-6 text-end">
+            <button class="btn btn-success export-btn me-2">
+                <i class="bi bi-download me-1"></i>Export CSV
+            </button>
+            <button class="btn btn-info export-btn">
+                <i class="bi bi-file-earmark-pdf me-1"></i>Export PDF
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Logs Table -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-journal-text me-2"></i>Activity Logs</h5>
+        <div class="d-flex align-items-center">
+            <span class="text-muted me-3">Total: {{ activities|length }} entries</span>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="logsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>File Path</th>
+                        <th>Status</th>
+                        <th>Risk Level</th>
+                        <th>IP Address</th>
+                        <th>File Size</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for activity in activities %}
+                    <tr>
+                        <td><small class="text-muted">{{ activity.timestamp }}</small></td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="user-avatar me-2">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                                {{ activity.username }}
+                            </div>
+                        </td>
+                        <td><span class="badge bg-secondary">{{ activity.action }}</span></td>
+                        <td><code class="small">{{ activity.file_path }}</code></td>
+                        <td>
+                            <span class="badge {% if activity.status == 'Authorized' %}bg-success{% else %}bg-danger{% endif %}">
+                                <i class="bi bi-{% if activity.status == 'Authorized' %}check{% else %}x{% endif %}-circle me-1"></i>{{ activity.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge {% if activity.risk_level == 'High' %}bg-danger{% elif activity.risk_level == 'Medium' %}bg-warning{% else %}bg-success{% endif %}">
+                                {{ activity.risk_level }}
+                            </span>
+                        </td>
+                        <td><code class="small">{{ activity.ip_address }}</code></td>
+                        <td><small class="text-muted">{{ "%.2f KB"|format(activity.file_size / 1024) }}</small></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
