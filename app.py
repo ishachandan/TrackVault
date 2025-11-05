@@ -4,10 +4,11 @@ import json
 import random
 import threading
 import sqlite3
+import os
 from file_monitor import FileMonitorService
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-change-this'
+app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-please-change-in-production')
 
 # Initialize file monitor service
 file_monitor = FileMonitorService([

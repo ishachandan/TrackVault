@@ -9,9 +9,10 @@ import sqlite3
 import json
 from datetime import datetime, timedelta
 import os
+import secrets
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-change-this'
+app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-please-change-in-production')
 
 # Configuration
 MONITOR_DB = "monitor_data.db"
